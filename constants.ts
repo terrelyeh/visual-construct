@@ -110,6 +110,45 @@ export const MEDIUM_DESCRIPTIONS: Record<TargetMedium, string> = {
   [TargetMedium.POSTER]: "針對海報與主視覺 (Aesthetic Impact)",
 };
 
+interface BestPractice {
+  title: string;
+  goldenRatio: string;
+  recipe: string[];
+  donts: string;
+}
+
+export const MEDIUM_BEST_PRACTICES: Record<TargetMedium, BestPractice> = {
+  [TargetMedium.SLIDES]: {
+    title: "簡報提案 (Slides) 最佳實踐",
+    goldenRatio: "建議張數：3 張 (黃金比例)",
+    recipe: [
+      "1 張 封面主視覺 (定義標題風格與主色調)",
+      "1 張 內頁版型 (定義圖文排版與留白邏輯)",
+      "1 張 數據圖表 (定義 Chart Sequence 配色)"
+    ],
+    donts: "請勿混用風格差異過大的圖片 (如極簡風混搭賽博龐克)，這會導致排版邏輯混亂。"
+  },
+  [TargetMedium.SAAS]: {
+    title: "SaaS / SPA 最佳實踐",
+    goldenRatio: "建議張數：3-4 張",
+    recipe: [
+      "1 張 全景結構圖 (Dashboard/Landing，定義 App Shell)",
+      "1 張 元件細節 (按鈕、表單，定義 UI States)",
+      "1 張 品牌氛圍圖 (不一定是介面，用於提取正確色票)"
+    ],
+    donts: "若要製作 Dark Mode，請確保 3 張圖皆為深色系，切勿深淺混搭。"
+  },
+  [TargetMedium.POSTER]: {
+    title: "海報視覺 (Poster) 最佳實踐",
+    goldenRatio: "建議張數：1-2 張",
+    recipe: [
+      "1 張 構圖參考 (定義佈局張力)",
+      "1 張 紋理參考 (定義紙質或雜訊細節)"
+    ],
+    donts: "避免上傳充滿純文字的圖片，AI 需要的是視覺構成而非文字內容。"
+  }
+};
+
 export const SAMPLE_YAML = `design_specification:
   meta:
     target_medium: "SPA / SaaS"

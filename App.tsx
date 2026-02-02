@@ -67,7 +67,8 @@ const AppContent: React.FC = () => {
       <main className="flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-0">
         
         {/* Left Column: Input Controls (Dark Overlay Theme) */}
-        <section className="lg:col-span-5 bg-[#1D1D1B] p-8 lg:p-12 flex flex-col border-r-0 lg:border-r-4 border-black relative bg-noise">
+        {/* Added z-20 to ensure tooltips/popovers from this column overlay the right column */}
+        <section className="lg:col-span-5 bg-[#1D1D1B] p-8 lg:p-12 flex flex-col border-r-0 lg:border-r-4 border-black relative z-20 bg-noise">
           
           <div className="max-w-md mx-auto w-full">
             <div className="mb-10 border-l-4 border-[#E61D23] pl-6">
@@ -118,7 +119,8 @@ const AppContent: React.FC = () => {
         </section>
 
         {/* Right Column: Output Viewer (Beige Base Theme) */}
-        <section className="lg:col-span-7 h-full min-h-[600px] lg:min-h-auto relative">
+        {/* z-10 ensures it stays behind the left column's popovers */}
+        <section className="lg:col-span-7 h-full min-h-[600px] lg:min-h-auto relative z-10">
           <ResultViewer state={analysisState} medium={medium} />
         </section>
 
