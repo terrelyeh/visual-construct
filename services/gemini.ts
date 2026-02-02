@@ -2,14 +2,26 @@ import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from '../constants';
 import { TargetMedium, AnalysisResult, VisualAsset } from '../types';
 
+// Helper to safely access env var without crashing
+const getEnvApiKey = () => {
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env.API_KEY;
+    }
+  } catch (e) {
+    return null;
+  }
+  return null;
+};
+
 export const analyzeImage = async (
   assets: VisualAsset[],
   medium: TargetMedium,
   apiKey: string | null
 ): Promise<AnalysisResult> => {
   
-  // Use passed key or fallback to env (if available and not strictly handled by context)
-  const activeKey = apiKey || process.env.API_KEY;
+  // Use passed key or fallback to env (safely)
+  const activeKey = apiKey || getEnvApiKey();
 
   if (!activeKey) {
     throw new Error("API Key is missing. Please configure it in the settings.");
@@ -114,7 +126,7 @@ export const generateVisualPreview = async (
 ): Promise<string> => {
   
   // Priority: 1. Passed Key (Custom/Env), 2. AI Studio Window Key (Legacy/Extension)
-  let activeKey = apiKey || process.env.API_KEY;
+  let activeKey = apiKey || getEnvApiKey();
 
   // 1. Mandatory API Key Selection logic for Veo/Pro models if no key provided
   // Note: Since we implemented BYOK, we prefer the explicit key, but keep this check for completeness.

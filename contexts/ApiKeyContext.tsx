@@ -10,14 +10,25 @@ interface ApiKeyContextType {
 
 const ApiKeyContext = createContext<ApiKeyContextType | undefined>(undefined);
 
+// Helper to safely access env var without crashing in browser if process is undefined
+const getEnvApiKey = () => {
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env.API_KEY;
+    }
+  } catch (e) {
+    // Ignore reference errors
+  }
+  return null;
+};
+
 export const ApiKeyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [apiKey, setApiKeyState] = useState<string | null>(null);
   const [isUsingEnv, setIsUsingEnv] = useState(false);
 
   useEffect(() => {
     // 1. Check for Environment Variable first (Vercel / Build time)
-    // Note: In some build setups, process.env.API_KEY might be an empty string if not set, so we check for length.
-    const envKey = process.env.API_KEY;
+    const envKey = getEnvApiKey();
 
     if (envKey && envKey.length > 0 && !envKey.startsWith('YOUR_')) {
       setApiKeyState(envKey);
@@ -44,12 +55,8 @@ export const ApiKeyProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setIsUsingEnv(false);
     localStorage.removeItem('user_gemini_api_key');
     
-    // If env exists, it will naturally come back on refresh, 
-    // but for current session we clear it to allow "Override" logic if needed.
-    // However, usually we just want to clear the custom user key.
-    
     // Re-check env var immediately for fallback
-    const envKey = process.env.API_KEY;
+    const envKey = getEnvApiKey();
     if (envKey && envKey.length > 0 && !envKey.startsWith('YOUR_')) {
         setApiKeyState(envKey);
         setIsUsingEnv(true);
