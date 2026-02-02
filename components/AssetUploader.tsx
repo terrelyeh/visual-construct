@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { VisualAsset } from '../types';
 
 interface AssetUploaderProps {
@@ -9,8 +9,6 @@ interface AssetUploaderProps {
 
 export const AssetUploader: React.FC<AssetUploaderProps> = ({ assets, onAssetsChange, onReset }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [urlInput, setUrlInput] = useState('');
-  const [urlError, setUrlError] = useState<string | null>(null);
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -23,46 +21,6 @@ export const AssetUploader: React.FC<AssetUploaderProps> = ({ assets, onAssetsCh
       previewUrl: URL.createObjectURL(file)
     }));
     onAssetsChange([...assets, ...newAssets]);
-  };
-
-  const handleUrlAdd = async () => {
-    if (!urlInput) return;
-    setUrlError(null);
-    
-    // Check if it looks like an image roughly
-    // We allow standard extensions or data URIs
-    const isLikeImage = urlInput.match(/\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i) || urlInput.startsWith('data:image');
-
-    if (!isLikeImage) {
-        // Just a warning UI-wise, but we still try loading it in case it's a dynamic image URL
-        // But we add a specific hint in the error if it fails later.
-    }
-
-    // Attempt to load image to check availability
-    const img = new Image();
-    img.crossOrigin = "Anonymous"; // Try to request CORS access
-    
-    img.onload = () => {
-      const newAsset: VisualAsset = {
-        id: generateId(),
-        type: 'url',
-        url: urlInput,
-        previewUrl: urlInput
-      };
-      onAssetsChange([...assets, newAsset]);
-      setUrlInput('');
-    };
-
-    img.onerror = () => {
-      // Robust error handling
-      if (!isLikeImage) {
-         setUrlError("這看起來像是一般網頁連結。若要分析網站視覺，請使用「螢幕截圖」後上傳圖片，AI 才能精準讀取像素。");
-      } else {
-         setUrlError("無法讀取圖片。可能是該網站阻擋了外部存取 (CORS)，請下載圖片後直接拖曳上傳。");
-      }
-    };
-    
-    img.src = urlInput;
   };
 
   const removeAsset = (id: string) => {
@@ -101,42 +59,6 @@ export const AssetUploader: React.FC<AssetUploaderProps> = ({ assets, onAssetsCh
         </div>
       </div>
       
-      {/* URL Input Bar */}
-      <div className="flex flex-col gap-2 mb-4">
-        <div className="flex gap-2">
-          <input 
-            type="text" 
-            placeholder="PASTE DIRECT IMAGE LINK (e.g. .jpg, .png)..." 
-            className="flex-1 bg-[#2A2A28] border-2 border-[#555] p-2 text-[#E8DCC4] font-mono text-sm focus:border-[#F29422] outline-none transition-colors placeholder-gray-500"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleUrlAdd()}
-          />
-          <button 
-            onClick={handleUrlAdd}
-            className="bg-[#1D1D1B] border-2 border-[#E8DCC4] text-[#E8DCC4] px-4 font-bold hover:bg-[#E8DCC4] hover:text-[#1D1D1B] transition-colors uppercase text-xs tracking-wider"
-          >
-            Add URL
-          </button>
-        </div>
-        
-        {/* Helper Text for Website vs Image */}
-        <div className="flex items-start gap-2 px-1">
-           <svg className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-           <p className="text-[10px] text-gray-400 font-mono leading-tight">
-             <span className="text-[#F29422] font-bold">TIP:</span> 若要分析網站風格，請使用<span className="text-white border-b border-gray-600">系統截圖 (Screenshot)</span> 後上傳。直接貼上網站首頁連結 (如 www.apple.com) AI 無法讀取畫面。
-           </p>
-        </div>
-      </div>
-
-      {urlError && (
-        <div className="mb-4 bg-[#E61D23]/10 border-l-4 border-[#E61D23] p-3 animate-in fade-in slide-in-from-top-1">
-          <p className="text-[#E61D23] text-xs font-bold font-mono flex items-center gap-2">
-            <span className="text-lg">!</span> {urlError}
-          </p>
-        </div>
-      )}
-
       {/* Main Drop/Grid Area */}
       <div className="min-h-[288px] bg-[#1D1D1B] border-4 border-[#333] p-4 relative bg-noise">
          
